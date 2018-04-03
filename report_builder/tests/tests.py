@@ -1,5 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models.query import QuerySet
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -507,13 +507,13 @@ class ReportTests(TestCase):
         """
         Make a mock report using the People demo model.
 
-        Creates mock People instances and returns a report including the 
+        Creates mock People instances and returns a report including the
         following DisplayFields:
             first_name      (CharField)
             last_modifed    (DateField)
             birth_date      (DateTimeField)
             hammer_time     (TimeField)
-        """ 
+        """
         self.make_people()
         model = ContentType.objects.get(model="person",
                                         app_label="demo_models")
@@ -565,7 +565,7 @@ class ReportTests(TestCase):
         # DateField
         ff = FilterField.objects.create(
             report=people_report,
-            field='last_modifed', 
+            field='last_modifed',
             filter_type='lte',
             filter_value=str(date.today() - timedelta(seconds=self.day * 10)),
         )
@@ -576,7 +576,7 @@ class ReportTests(TestCase):
         self.assertEquals(len(response.data['data']), 3)
 
         # TimeField
-        ff.field = 'hammer_time' 
+        ff.field = 'hammer_time'
         ff.filter_value = str(dtime(hour=13))
         ff.save()
 
@@ -584,7 +584,7 @@ class ReportTests(TestCase):
         self.assertEquals(len(response.data['data']), 1)
 
         # DateTimeField
-        ff.field = 'birth_date' 
+        ff.field = 'birth_date'
         ff.filter_value = str(datetime.today() - timedelta(seconds=self.day * 40))
         ff.save()
 
@@ -595,8 +595,8 @@ class ReportTests(TestCase):
     def test_filter_datetime_range(self):
         """
         Test filtering 'DateTime' field types using a range filter.
-        
-        Each FilterField accepts 2 values of the respective field type to 
+
+        Each FilterField accepts 2 values of the respective field type to
         create the range.
 
         Ex. Filter a TimeField for 'user logins between 10am - 1pm':
@@ -609,7 +609,7 @@ class ReportTests(TestCase):
         # DateField
         ff = FilterField.objects.create(
             report=people_report,
-            field='last_modifed', 
+            field='last_modifed',
             filter_type='range',
             filter_value=str(date.today() - timedelta(seconds=self.day * 7)),
             filter_value2=str(date.today()),
@@ -620,7 +620,7 @@ class ReportTests(TestCase):
         self.assertEquals(len(response.data['data']), 1)
 
         # TimeField
-        ff.field = 'hammer_time' 
+        ff.field = 'hammer_time'
         ff.filter_value = str(dtime(hour=10))
         ff.filter_value2 = str(dtime(hour=13))
         ff.save()
@@ -629,7 +629,7 @@ class ReportTests(TestCase):
         self.assertEquals(len(response.data['data']), 1)
 
         # DateTimeField
-        ff.field = 'birth_date' 
+        ff.field = 'birth_date'
         ff.filter_value = str(datetime.now() - timedelta(seconds=self.day * 50))
         ff.filter_value2 = str(datetime.now() - timedelta(seconds=self.day * 70))
         ff.save()
@@ -642,8 +642,8 @@ class ReportTests(TestCase):
         """
         Test filtering 'DateTime' field types using a relative range filter.
 
-        Each FilterField accepts a delta value (in seconds) which represents 
-        the range (positive or negative) off of the current date. 
+        Each FilterField accepts a delta value (in seconds) which represents
+        the range (positive or negative) off of the current date.
 
         Ex. Filter a TimeField for 'user logins in the last 3 hours':
             filter_type='relative_range',
@@ -664,7 +664,7 @@ class ReportTests(TestCase):
         self.assertEquals(len(response.data['data']), 1)
 
         # DateField w/ partial day
-        ff.filter_delta = self.day * -7 + 5 
+        ff.filter_delta = self.day * -7 + 5
         ff.save()
 
         response = self.client.get(generate_url)
@@ -703,7 +703,7 @@ class ReportTests(TestCase):
     def test_filter_datefield_relative_range_over_time(self):
         """
         Test filtering DateField types using a relative range filter
-        over time. 
+        over time.
         """
         people_report = self.make_people_report()
         generate_url = reverse('generate_report', args=[people_report.id])
@@ -730,15 +730,15 @@ class ReportTests(TestCase):
     def test_filter_timefield_relative_range_over_time(self):
         """
         Test filtering TimeField field types using a relative range filter
-        over time. 
+        over time.
         """
-        
+
         people_report = self.make_people_report()
         generate_url = reverse('generate_report', args=[people_report.id])
-        
+
         initial_today = datetime(2017, 11, 1, 12)
         four_hours_later_today = datetime(2017, 11, 1, 16)
-        
+
         # TimeField with login 'now'
         with freeze_time(initial_today) as frozen_today:
             FilterField.objects.create(
@@ -758,11 +758,11 @@ class ReportTests(TestCase):
     def test_filter_datetimefield_relative_range_over_time(self):
         """
         Test filtering DateTimeField field types using a relative range filter
-        over time. 
+        over time.
         """
         people_report = self.make_people_report()
         generate_url = reverse('generate_report', args=[people_report.id])
-        
+
         initial_today = datetime(2017, 10, 1, 12)
         one_month_later = datetime(2017, 11, 1, 12)
 

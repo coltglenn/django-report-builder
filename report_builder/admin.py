@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
+from django.ulrs import reverse
 from django.http import HttpResponseRedirect
 from report_builder.models import Report, Format
 from django.conf import settings
